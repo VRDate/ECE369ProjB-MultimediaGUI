@@ -144,6 +144,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "ECE 369 Project B -- Multimedia Application";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.mainMS.ResumeLayout(false);
             this.mainMS.PerformLayout();
