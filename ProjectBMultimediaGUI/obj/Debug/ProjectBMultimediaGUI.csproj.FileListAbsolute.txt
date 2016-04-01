@@ -7,3 +7,12 @@ C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ProjectBMultimediaGUI\obj\D
 C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.csproj.GenerateResource.Cache
 C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.exe
 C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.pdb
+C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ECE369ProjB-MultimediaGUI\ProjectBMultimediaGUI\bin\Debug\ProjectBMultimediaGUI.exe.config
+C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ECE369ProjB-MultimediaGUI\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.exe
+C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ECE369ProjB-MultimediaGUI\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.pdb
+C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ECE369ProjB-MultimediaGUI\ProjectBMultimediaGUI\bin\Debug\ProjectBMultimediaGUI.exe
+C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ECE369ProjB-MultimediaGUI\ProjectBMultimediaGUI\bin\Debug\ProjectBMultimediaGUI.pdb
+C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ECE369ProjB-MultimediaGUI\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.csprojResolveAssemblyReference.cache
+C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ECE369ProjB-MultimediaGUI\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.Form1.resources
+C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ECE369ProjB-MultimediaGUI\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.Properties.Resources.resources
+C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ECE369ProjB-MultimediaGUI\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.csproj.GenerateResource.Cache

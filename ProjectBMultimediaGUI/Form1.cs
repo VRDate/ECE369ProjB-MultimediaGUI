@@ -26,5 +26,15 @@ namespace ProjectBMultimediaGUI
             fopen.CheckFileExists = true; fopen.CheckPathExists = true; fopen.Filter = "WAV Files|*.wav";
             fopen.ShowDialog();
         }
+
+        private void playpauseBUT_MouseClick(object sender, MouseEventArgs e)
+        {
+            (sender as Button).ImageIndex = ((sender as Button).ImageIndex == 0) ? 1 : 0;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            butIML.ImageSize = new Size(playpauseBUT.Size.Width-1,playpauseBUT.Size.Height-1); // This ensures the play and pause buttons are always the same size as the button they are encased in
+        }
     }
 }
