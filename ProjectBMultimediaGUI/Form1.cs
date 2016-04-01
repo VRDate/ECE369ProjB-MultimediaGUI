@@ -35,6 +35,18 @@ namespace ProjectBMultimediaGUI
         private void Form1_Load(object sender, EventArgs e)
         {
             butIML.ImageSize = new Size(playpauseBUT.Size.Width-1,playpauseBUT.Size.Height-1); // This ensures the play and pause buttons are always the same size as the button they are encased in
+            stopBUT.Size = playpauseBUT.Size; // Ensures the stop button is the same size as the play/pause button.
+            stopBUT.Location = new Point(stopBUT.Location.X, playpauseBUT.Location.Y);
+        }
+
+        private void stopBUT_MouseClick(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void mainMS_Paint(object sender, PaintEventArgs e)
+        {
+            e.Graphics.DrawLine(new Pen(Color.Black), mainMS.Left, mainMS.Bottom-1, mainMS.Right, mainMS.Bottom-1); // Draws a border on the bottom of the main menu strip.
         }
     }
 }

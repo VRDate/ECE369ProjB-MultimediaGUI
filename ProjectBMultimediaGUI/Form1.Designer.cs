@@ -37,11 +37,14 @@
             this.hostsLB = new System.Windows.Forms.ListBox();
             this.playpauseBUT = new System.Windows.Forms.Button();
             this.butIML = new System.Windows.Forms.ImageList(this.components);
+            this.stopBUT = new System.Windows.Forms.Button();
+            this.availclientsLBL = new System.Windows.Forms.Label();
             this.mainMS.SuspendLayout();
             this.SuspendLayout();
             // 
             // mainMS
             // 
+            this.mainMS.BackColor = System.Drawing.Color.White;
             this.mainMS.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem});
             this.mainMS.Location = new System.Drawing.Point(0, 0);
@@ -49,6 +52,7 @@
             this.mainMS.Size = new System.Drawing.Size(676, 24);
             this.mainMS.TabIndex = 0;
             this.mainMS.Text = "menuStrip1";
+            this.mainMS.Paint += new System.Windows.Forms.PaintEventHandler(this.mainMS_Paint);
             // 
             // fileToolStripMenuItem
             // 
@@ -76,7 +80,7 @@
             // hostsLB
             // 
             this.hostsLB.FormattingEnabled = true;
-            this.hostsLB.Location = new System.Drawing.Point(12, 27);
+            this.hostsLB.Location = new System.Drawing.Point(12, 42);
             this.hostsLB.Name = "hostsLB";
             this.hostsLB.Size = new System.Drawing.Size(150, 95);
             this.hostsLB.TabIndex = 1;
@@ -88,7 +92,7 @@
             this.playpauseBUT.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.playpauseBUT.ImageIndex = 0;
             this.playpauseBUT.ImageList = this.butIML;
-            this.playpauseBUT.Location = new System.Drawing.Point(12, 128);
+            this.playpauseBUT.Location = new System.Drawing.Point(12, 143);
             this.playpauseBUT.Name = "playpauseBUT";
             this.playpauseBUT.Size = new System.Drawing.Size(65, 65);
             this.playpauseBUT.TabIndex = 2;
@@ -101,12 +105,38 @@
             this.butIML.TransparentColor = System.Drawing.Color.Transparent;
             this.butIML.Images.SetKeyName(0, "playbutton.png");
             this.butIML.Images.SetKeyName(1, "pausebutton.png");
+            this.butIML.Images.SetKeyName(2, "stopbutton.png");
+            // 
+            // stopBUT
+            // 
+            this.stopBUT.BackColor = System.Drawing.Color.Transparent;
+            this.stopBUT.FlatAppearance.BorderSize = 0;
+            this.stopBUT.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.stopBUT.ImageIndex = 2;
+            this.stopBUT.ImageList = this.butIML;
+            this.stopBUT.Location = new System.Drawing.Point(97, 143);
+            this.stopBUT.Name = "stopBUT";
+            this.stopBUT.Size = new System.Drawing.Size(65, 65);
+            this.stopBUT.TabIndex = 2;
+            this.stopBUT.UseVisualStyleBackColor = false;
+            this.stopBUT.MouseClick += new System.Windows.Forms.MouseEventHandler(this.stopBUT_MouseClick);
+            // 
+            // availclientsLBL
+            // 
+            this.availclientsLBL.AutoSize = true;
+            this.availclientsLBL.Location = new System.Drawing.Point(12, 26);
+            this.availclientsLBL.Name = "availclientsLBL";
+            this.availclientsLBL.Size = new System.Drawing.Size(84, 13);
+            this.availclientsLBL.TabIndex = 3;
+            this.availclientsLBL.Text = "Available Clients";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(676, 482);
+            this.Controls.Add(this.availclientsLBL);
+            this.Controls.Add(this.stopBUT);
             this.Controls.Add(this.playpauseBUT);
             this.Controls.Add(this.hostsLB);
             this.Controls.Add(this.mainMS);
@@ -131,6 +161,8 @@
         private System.Windows.Forms.ListBox hostsLB;
         private System.Windows.Forms.Button playpauseBUT;
         private System.Windows.Forms.ImageList butIML;
+        private System.Windows.Forms.Button stopBUT;
+        private System.Windows.Forms.Label availclientsLBL;
     }
 }
 
