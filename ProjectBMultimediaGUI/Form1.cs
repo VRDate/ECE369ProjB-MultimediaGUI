@@ -20,28 +20,34 @@ namespace ProjectBMultimediaGUI
         const int PUBLISH_PORT_NUMBER = 8030; // Port number used for publish (UDP communications)
         const int TCP_PORT_NUMBER = 8031; // Port number used for the rest of communications (TCP communications)
 
-        const string CLIENT_ANNOUNCE = "[ECE 369] Multimedia client publish";
-        const string CLIENT_DISCONNECT = "[ECE 369] Multimedia client disconnect";
+        const string CLIENT_ANNOUNCE = "[ECE 369] Multimedia client publish"; // UDP datagram to be sent when the client is announcing itself
+        const string CLIENT_DISCONNECT = "[ECE 369] Multimedia client disconnect"; // UDP datagram to be sent when the client is announcing that it is disconnecting
 
         UdpClient pub = new UdpClient(PUBLISH_PORT_NUMBER, AddressFamily.InterNetwork); // Creates a new UDP client capable of communicating on a network on port defined by const, via IPv4 addressing
-        IPEndPoint UDP_BROADCAST = new IPEndPoint(IPAddress.Broadcast, PUBLISH_PORT_NUMBER);
+        IPEndPoint UDP_BROADCAST = new IPEndPoint(IPAddress.Broadcast, PUBLISH_PORT_NUMBER); // Broadcast address and port
 
-        Timer tmr = new Timer();
+        IPAddress me = GetLocalIP(); // me is the IPAddress that your machine currently owns on the local network
+
+        Timer tmr = new Timer(); // Timer used to announce client on the local network every 250 ms
 
         bool isClosing = false; // Used to determine if program is closing
 
         public Form1()
         {
             InitializeComponent();
+            #region Timer Setup
             tmr.Interval = 250;
             tmr.Start();
             tmr.Tick += new EventHandler(tmr_Tick);
+            #endregion
         }
+
         private void tmr_Tick(object sender, EventArgs e)
         {
             if (!isClosing)
                 Announce_Client_Connect(); // Announce the client is connected every 250 ms
         }
+
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         { Application.Exit(); }
 
@@ -102,23 +108,26 @@ namespace ProjectBMultimediaGUI
 
         private void HandleMsg(string msg, IPEndPoint sender) // Used for handling UDP messages
         {
-            if(InvokeRequired) // Used for handling thread magic. Please don't ask me to explain this.
-            {
-                ObjectDelegate method = new ObjectDelegate(HandleMsg);
-                Invoke(method, msg, sender);
-                return;
-            }
+            if (!sender.Address.Equals(me)) // Verifies the UDP datagram received isn't from your own machine.
+            { //This is done because some UDP datagrams are sent to the broadcast address, which means we receive what we've sent. We obviously don't want packets from ourselves so we block them.
+                if (InvokeRequired) // Used for handling thread magic. Please don't ask me to explain this.
+                {
+                    ObjectDelegate method = new ObjectDelegate(HandleMsg);
+                    Invoke(method, msg, sender);
+                    return;
+                }
 
-            switch(msg)
-            {
-                case CLIENT_ANNOUNCE:
-                    if (!hostsLB.Items.Contains(sender.Address)) // If the client is not already in the list box
-                        hostsLB.Items.Add(sender.Address);
-                    break;
-                case CLIENT_DISCONNECT:
-                    if (hostsLB.Items.Contains(sender.Address))
-                        hostsLB.Items.Remove(sender.Address);
-                    break;
+                switch (msg)
+                {
+                    case CLIENT_ANNOUNCE:
+                        if (!hostsLB.Items.Contains(sender.Address)) // If the client is not already in the list box
+                            hostsLB.Items.Add(sender.Address);
+                        break;
+                    case CLIENT_DISCONNECT:
+                        if (hostsLB.Items.Contains(sender.Address))
+                            hostsLB.Items.Remove(sender.Address);
+                        break;
+                }
             }
         }
 
@@ -138,6 +147,20 @@ namespace ProjectBMultimediaGUI
         {
             byte[] dgram = Encoding.ASCII.GetBytes(CLIENT_ANNOUNCE);
             pub.Send(dgram, dgram.Length, UDP_BROADCAST);
+        }
+
+        static IPAddress GetLocalIP() // Has the machine report its local network IP address
+        {
+            IPHostEntry host;
+            host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (IPAddress ip in host.AddressList)
+            {
+                if (ip.AddressFamily.ToString() == "InterNetwork")
+                {
+                    return ip;
+                }
+            }
+            return null;
         }
     }
 }
