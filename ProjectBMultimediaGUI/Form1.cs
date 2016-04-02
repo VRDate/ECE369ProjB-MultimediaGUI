@@ -26,13 +26,22 @@ namespace ProjectBMultimediaGUI
         UdpClient pub = new UdpClient(PUBLISH_PORT_NUMBER, AddressFamily.InterNetwork); // Creates a new UDP client capable of communicating on a network on port defined by const, via IPv4 addressing
         IPEndPoint UDP_BROADCAST = new IPEndPoint(IPAddress.Broadcast, PUBLISH_PORT_NUMBER);
 
+        Timer tmr = new Timer();
+
         bool isClosing = false; // Used to determine if program is closing
 
         public Form1()
         {
             InitializeComponent();
+            tmr.Interval = 250;
+            tmr.Start();
+            tmr.Tick += new EventHandler(tmr_Tick);
         }
-
+        private void tmr_Tick(object sender, EventArgs e)
+        {
+            if (!isClosing)
+                Announce_Client_Connect(); // Announce the client is connected every 250 ms
+        }
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         { Application.Exit(); }
 
@@ -103,12 +112,12 @@ namespace ProjectBMultimediaGUI
             switch(msg)
             {
                 case CLIENT_ANNOUNCE:
-                    if (!hostsLB.Items.Contains(sender)) // If the client is not already in the list box
-                        hostsLB.Items.Add(sender);
+                    if (!hostsLB.Items.Contains(sender.Address)) // If the client is not already in the list box
+                        hostsLB.Items.Add(sender.Address);
                     break;
                 case CLIENT_DISCONNECT:
-                    if (hostsLB.Items.Contains(sender))
-                        hostsLB.Items.Remove(sender);
+                    if (hostsLB.Items.Contains(sender.Address))
+                        hostsLB.Items.Remove(sender.Address);
                     break;
             }
         }
