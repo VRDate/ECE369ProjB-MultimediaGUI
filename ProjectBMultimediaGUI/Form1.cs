@@ -15,11 +15,17 @@ namespace ProjectBMultimediaGUI
 {
     public partial class Form1 : Form
     {
-        private delegate void ObjectDelegate(object obj);
+        private delegate void ObjectDelegate(string msg, IPEndPoint sender);
+        private delegate void AddClient(IPEndPoint client);
 
         const int PUBLISH_PORT_NUMBER = 8030; // Port number used for publish (UDP communications)
         const int TCP_PORT_NUMBER = 8031; // Port number used for the rest of communications (TCP communications)
+
+        const string CLIENT_ANNOUNCE = "[ECE 369] Multimedia client publish";
+        const string CLIENT_DISCONNECT = "[ECE 369] Multimedia client disconnect";
+
         UdpClient pub = new UdpClient(PUBLISH_PORT_NUMBER, AddressFamily.InterNetwork); // Creates a new UDP client capable of communicating on a network on port defined by const, via IPv4 addressing
+        IPEndPoint UDP_BROADCAST = new IPEndPoint(IPAddress.Broadcast, PUBLISH_PORT_NUMBER);
 
         bool isClosing = false; // Used to determine if program is closing
 
@@ -52,6 +58,8 @@ namespace ProjectBMultimediaGUI
             pub.AllowNatTraversal(false); // Disables the ability for the program to communicate with the outside world, for security purposes
             try { pub.BeginReceive(new AsyncCallback(RecvPub), null); }
             catch(Exception err) { MessageBox.Show("An error occurred!\n"+err.ToString()); Application.Exit(); }
+
+            Announce_Client_Connect();
         }
 
         private void stopBUT_MouseClick(object sender, MouseEventArgs e)
@@ -75,24 +83,51 @@ namespace ProjectBMultimediaGUI
             if(message != null) // If a message was received
             {
                 ObjectDelegate del = new ObjectDelegate(HandleMsg);
-                del.Invoke(message);
-
                 dmessage = Encoding.ASCII.GetString(message);
-                HandleMsg(dmessage);
+                del.Invoke(dmessage, recv);
+                HandleMsg(dmessage, recv);
             }
 
             if (!isClosing)
                 pub.BeginReceive(new AsyncCallback(RecvPub), null);
         }
 
-        private void HandleMsg(object obj) // Used for handling UDP messages
+        private void HandleMsg(string msg, IPEndPoint sender) // Used for handling UDP messages
         {
+            switch(msg)
+            {
+                case CLIENT_ANNOUNCE:
+                    if (!hostsLB.Items.Contains(sender)) // If the client is not already in the list box
+                        ;
+                    break;
+                case CLIENT_DISCONNECT:
+                    if (hostsLB.Items.Contains(sender))
+                        hostsLB.Items.Remove(sender);
+                    break;
+            }
+        }
 
+        private void AddClient(IPEndPoint client)
+        {
+            hostsLB.Items.Add(client);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             isClosing = true;
+            Announce_Client_Disconnect();
+        }
+
+        private void Announce_Client_Disconnect()
+        {
+            byte[] dgram = Encoding.ASCII.GetBytes(CLIENT_DISCONNECT);
+            pub.Send(dgram, dgram.Length, UDP_BROADCAST);
+        }
+
+        private void Announce_Client_Connect()
+        {
+            byte[] dgram = Encoding.ASCII.GetBytes(CLIENT_ANNOUNCE);
+            pub.Send(dgram, dgram.Length, UDP_BROADCAST);
         }
     }
 }
