@@ -16,7 +16,6 @@ namespace ProjectBMultimediaGUI
     public partial class Form1 : Form
     {
         private delegate void ObjectDelegate(string msg, IPEndPoint sender);
-        private delegate void AddClient(IPEndPoint client);
 
         const int PUBLISH_PORT_NUMBER = 8030; // Port number used for publish (UDP communications)
         const int TCP_PORT_NUMBER = 8031; // Port number used for the rest of communications (TCP communications)
@@ -94,22 +93,24 @@ namespace ProjectBMultimediaGUI
 
         private void HandleMsg(string msg, IPEndPoint sender) // Used for handling UDP messages
         {
+            if(InvokeRequired) // Used for handling thread magic. Please don't ask me to explain this.
+            {
+                ObjectDelegate method = new ObjectDelegate(HandleMsg);
+                Invoke(method, msg, sender);
+                return;
+            }
+
             switch(msg)
             {
                 case CLIENT_ANNOUNCE:
                     if (!hostsLB.Items.Contains(sender)) // If the client is not already in the list box
-                        ;
+                        hostsLB.Items.Add(sender);
                     break;
                 case CLIENT_DISCONNECT:
                     if (hostsLB.Items.Contains(sender))
                         hostsLB.Items.Remove(sender);
                     break;
             }
-        }
-
-        private void AddClient(IPEndPoint client)
-        {
-            hostsLB.Items.Add(client);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
