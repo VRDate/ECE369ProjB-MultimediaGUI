@@ -39,6 +39,9 @@
             this.butIML = new System.Windows.Forms.ImageList(this.components);
             this.stopBUT = new System.Windows.Forms.Button();
             this.availclientsLBL = new System.Windows.Forms.Label();
+            this.filepathTB = new System.Windows.Forms.TextBox();
+            this.browseBUT = new System.Windows.Forms.Button();
+            this.sendwavBUT = new System.Windows.Forms.Button();
             this.mainMS.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -92,7 +95,7 @@
             this.playpauseBUT.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.playpauseBUT.ImageIndex = 0;
             this.playpauseBUT.ImageList = this.butIML;
-            this.playpauseBUT.Location = new System.Drawing.Point(12, 143);
+            this.playpauseBUT.Location = new System.Drawing.Point(12, 195);
             this.playpauseBUT.Name = "playpauseBUT";
             this.playpauseBUT.Size = new System.Drawing.Size(65, 65);
             this.playpauseBUT.TabIndex = 2;
@@ -114,7 +117,7 @@
             this.stopBUT.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.stopBUT.ImageIndex = 2;
             this.stopBUT.ImageList = this.butIML;
-            this.stopBUT.Location = new System.Drawing.Point(97, 143);
+            this.stopBUT.Location = new System.Drawing.Point(97, 195);
             this.stopBUT.Name = "stopBUT";
             this.stopBUT.Size = new System.Drawing.Size(65, 65);
             this.stopBUT.TabIndex = 2;
@@ -130,11 +133,41 @@
             this.availclientsLBL.TabIndex = 3;
             this.availclientsLBL.Text = "Available Clients";
             // 
+            // filepathTB
+            // 
+            this.filepathTB.Location = new System.Drawing.Point(12, 143);
+            this.filepathTB.Name = "filepathTB";
+            this.filepathTB.Size = new System.Drawing.Size(150, 20);
+            this.filepathTB.TabIndex = 4;
+            // 
+            // browseBUT
+            // 
+            this.browseBUT.Location = new System.Drawing.Point(12, 169);
+            this.browseBUT.Name = "browseBUT";
+            this.browseBUT.Size = new System.Drawing.Size(75, 20);
+            this.browseBUT.TabIndex = 5;
+            this.browseBUT.Text = "Browse";
+            this.browseBUT.UseVisualStyleBackColor = true;
+            this.browseBUT.MouseClick += new System.Windows.Forms.MouseEventHandler(this.browseBUT_MouseClick);
+            // 
+            // sendwavBUT
+            // 
+            this.sendwavBUT.Location = new System.Drawing.Point(87, 169);
+            this.sendwavBUT.Name = "sendwavBUT";
+            this.sendwavBUT.Size = new System.Drawing.Size(75, 20);
+            this.sendwavBUT.TabIndex = 6;
+            this.sendwavBUT.Text = "Send";
+            this.sendwavBUT.UseVisualStyleBackColor = true;
+            this.sendwavBUT.MouseClick += new System.Windows.Forms.MouseEventHandler(this.sendwavBUT_MouseClick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(676, 482);
+            this.Controls.Add(this.sendwavBUT);
+            this.Controls.Add(this.browseBUT);
+            this.Controls.Add(this.filepathTB);
             this.Controls.Add(this.availclientsLBL);
             this.Controls.Add(this.stopBUT);
             this.Controls.Add(this.playpauseBUT);
@@ -164,6 +197,9 @@
         private System.Windows.Forms.ImageList butIML;
         private System.Windows.Forms.Button stopBUT;
         private System.Windows.Forms.Label availclientsLBL;
+        private System.Windows.Forms.TextBox filepathTB;
+        private System.Windows.Forms.Button browseBUT;
+        private System.Windows.Forms.Button sendwavBUT;
     }
 }
 

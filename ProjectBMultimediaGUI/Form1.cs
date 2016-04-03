@@ -10,6 +10,8 @@ using System.Windows.Forms;
 
 using System.Net.Sockets; // For network programming
 using System.Net; // For network programming
+using System.Media; // For playing .WAV files
+using System.IO; // For playing .WAV files (SoundPlayer in System.Media accepts either a filepath or an IO stream.)
 
 namespace ProjectBMultimediaGUI
 {
@@ -19,6 +21,7 @@ namespace ProjectBMultimediaGUI
 
         const int PUBLISH_PORT_NUMBER = 8030; // Port number used for publish (UDP communications)
         const int TCP_PORT_NUMBER = 8031; // Port number used for the rest of communications (TCP communications)
+        IPAddress me = GetLocalIP(); // me is the IPAddress that your machine currently owns on the local network
 
         const string CLIENT_ANNOUNCE = "[ECE 369] Multimedia client publish"; // UDP datagram to be sent when the client is announcing itself
         const string CLIENT_DISCONNECT = "[ECE 369] Multimedia client disconnect"; // UDP datagram to be sent when the client is announcing that it is disconnecting
@@ -26,7 +29,10 @@ namespace ProjectBMultimediaGUI
         UdpClient pub = new UdpClient(PUBLISH_PORT_NUMBER, AddressFamily.InterNetwork); // Creates a new UDP client capable of communicating on a network on port defined by const, via IPv4 addressing
         IPEndPoint UDP_BROADCAST = new IPEndPoint(IPAddress.Broadcast, PUBLISH_PORT_NUMBER); // Broadcast address and port
 
-        IPAddress me = GetLocalIP(); // me is the IPAddress that your machine currently owns on the local network
+        TcpClient recvr = new TcpClient(new IPEndPoint(GetLocalIP(), TCP_PORT_NUMBER)); // Bind socket
+        //Socket sock = new Socket(SocketType.Stream, ProtocolType.Tcp); // Initialize a TCP data stream
+
+        Stream wavstream = new MemoryStream(); // Initializes a memory stream that will hold .wav file data when being written to. Will be reinitialized in packet receiving functions
 
         Timer tmr = new Timer(); // Timer used to announce client on the local network every 250 ms
 
@@ -60,7 +66,19 @@ namespace ProjectBMultimediaGUI
 
         private void playpauseBUT_MouseClick(object sender, MouseEventArgs e)
         {
-            (sender as Button).ImageIndex = ((sender as Button).ImageIndex == 0) ? 1 : 0;
+            SoundPlayer splayer = new SoundPlayer(wavstream);
+            if (wavstream.CanRead && wavstream.Length > 0)
+                splayer.Play();
+            Button sbut = (sender as Button);
+            if (sbut.ImageIndex == 0) // If the PLAY button was clicked
+            {
+                sbut.ImageIndex = 1; // Change the button to show PAUSE
+            }
+            else // If the PAUSE button was clicked
+            {
+                splayer.Stop();
+                sbut.ImageIndex = 0; // Change the button to show PLAY
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -161,6 +179,31 @@ namespace ProjectBMultimediaGUI
                 }
             }
             return null;
+        }
+
+        private void browseBUT_MouseClick(object sender, MouseEventArgs e)
+        {
+            OpenFileDialog fopen = new OpenFileDialog();
+            fopen.CheckFileExists = true; fopen.CheckPathExists = true; fopen.Filter = "WAV Files|*.wav";
+            fopen.ShowDialog();
+            filepathTB.Text = fopen.FileName;
+        }
+
+        private void sendwavBUT_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (hostsLB.Items.Count > 0)
+            {
+                //srcvr.Connect()
+                //sock.BeginConnect()
+                recvr.BeginConnect((IPAddress)hostsLB.SelectedItem, TCP_PORT_NUMBER, TCPHandler, null);
+            }
+            else
+                MessageBox.Show("There are no clients to send this file to!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void TCPHandler(IAsyncResult res)
+        {
+
         }
     }
 }
