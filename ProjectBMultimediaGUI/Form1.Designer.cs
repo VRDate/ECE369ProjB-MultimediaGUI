@@ -42,6 +42,7 @@
             this.filepathTB = new System.Windows.Forms.TextBox();
             this.browseBUT = new System.Windows.Forms.Button();
             this.sendwavBUT = new System.Windows.Forms.Button();
+            this.filesendPB = new System.Windows.Forms.ProgressBar();
             this.mainMS.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -95,7 +96,7 @@
             this.playpauseBUT.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.playpauseBUT.ImageIndex = 0;
             this.playpauseBUT.ImageList = this.butIML;
-            this.playpauseBUT.Location = new System.Drawing.Point(12, 195);
+            this.playpauseBUT.Location = new System.Drawing.Point(12, 224);
             this.playpauseBUT.Name = "playpauseBUT";
             this.playpauseBUT.Size = new System.Drawing.Size(65, 65);
             this.playpauseBUT.TabIndex = 2;
@@ -117,7 +118,7 @@
             this.stopBUT.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.stopBUT.ImageIndex = 2;
             this.stopBUT.ImageList = this.butIML;
-            this.stopBUT.Location = new System.Drawing.Point(97, 195);
+            this.stopBUT.Location = new System.Drawing.Point(97, 224);
             this.stopBUT.Name = "stopBUT";
             this.stopBUT.Size = new System.Drawing.Size(65, 65);
             this.stopBUT.TabIndex = 2;
@@ -160,11 +161,20 @@
             this.sendwavBUT.UseVisualStyleBackColor = true;
             this.sendwavBUT.MouseClick += new System.Windows.Forms.MouseEventHandler(this.sendwavBUT_MouseClick);
             // 
+            // filesendPB
+            // 
+            this.filesendPB.Location = new System.Drawing.Point(12, 195);
+            this.filesendPB.Name = "filesendPB";
+            this.filesendPB.Size = new System.Drawing.Size(150, 23);
+            this.filesendPB.TabIndex = 7;
+            this.filesendPB.UseWaitCursor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(676, 482);
+            this.Controls.Add(this.filesendPB);
             this.Controls.Add(this.sendwavBUT);
             this.Controls.Add(this.browseBUT);
             this.Controls.Add(this.filepathTB);
@@ -200,6 +210,7 @@
         private System.Windows.Forms.TextBox filepathTB;
         private System.Windows.Forms.Button browseBUT;
         private System.Windows.Forms.Button sendwavBUT;
+        private System.Windows.Forms.ProgressBar filesendPB;
     }
 }
 

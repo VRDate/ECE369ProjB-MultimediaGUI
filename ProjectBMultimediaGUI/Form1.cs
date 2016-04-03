@@ -196,6 +196,16 @@ namespace ProjectBMultimediaGUI
                 //srcvr.Connect()
                 //sock.BeginConnect()
                 recvr.BeginConnect((IPAddress)hostsLB.SelectedItem, TCP_PORT_NUMBER, TCPHandler, null);
+                try
+                {
+                    FileStream fs = new FileStream(filepathTB.Text, FileMode.Open);
+                    while(fs.CanRead && fs.Position!=fs.Length)
+                    {
+                        recvr.GetStream().WriteByte((byte)fs.ReadByte());
+                        filesendPB.Value = (int)((fs.Position / fs.Length) * 100);
+                    }
+                }
+                catch(Exception err) { MessageBox.Show(err.ToString(),"Error",MessageBoxButtons.OK,MessageBoxIcon.Error); }
             }
             else if (hostsLB.Items.Count <= 0)
                 MessageBox.Show("There are no clients to send this file to!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -205,7 +215,7 @@ namespace ProjectBMultimediaGUI
 
         private void TCPHandler(IAsyncResult res)
         {
-            MessageBox.Show("Somehow, we got here.");
+            wavstream = recvr.GetStream();
         }
     }
 }
