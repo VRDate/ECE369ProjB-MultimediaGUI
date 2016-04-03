@@ -215,6 +215,7 @@ namespace ProjectBMultimediaGUI
                         tcpsender.GetStream().WriteByte((byte)fs.ReadByte());
                         filesendPB.Value = (int)((fs.Position / fs.Length) * 100);
                     }
+                    fs.Close();
                     MessageBox.Show("File send complete.");
                 }
                 catch(Exception err) { MessageBox.Show(err.ToString(),"Error",MessageBoxButtons.OK,MessageBoxIcon.Error); }
