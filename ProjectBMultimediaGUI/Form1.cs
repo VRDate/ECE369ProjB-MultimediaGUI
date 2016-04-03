@@ -197,13 +197,15 @@ namespace ProjectBMultimediaGUI
                 //sock.BeginConnect()
                 recvr.BeginConnect((IPAddress)hostsLB.SelectedItem, TCP_PORT_NUMBER, TCPHandler, null);
             }
-            else
+            else if (hostsLB.Items.Count <= 0)
                 MessageBox.Show("There are no clients to send this file to!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            else
+                MessageBox.Show("You must select a client!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void TCPHandler(IAsyncResult res)
         {
-
+            MessageBox.Show("Somehow, we got here.");
         }
     }
 }
