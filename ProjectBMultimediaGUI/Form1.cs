@@ -29,7 +29,7 @@ namespace ProjectBMultimediaGUI
         UdpClient pub = new UdpClient(PUBLISH_PORT_NUMBER, AddressFamily.InterNetwork); // Creates a new UDP client capable of communicating on a network on port defined by const, via IPv4 addressing
         IPEndPoint UDP_BROADCAST = new IPEndPoint(IPAddress.Broadcast, PUBLISH_PORT_NUMBER); // Broadcast address and port
 
-        TcpListener tlisten = new TcpListener(GetLocalIP(),TCP_PORT_NUMBER); // Sets up a listener that looks for TCP connections
+        TcpListener tlisten = new TcpListener(IPAddress.Any,TCP_PORT_NUMBER); // Sets up a listener that looks for TCP connections
 
         Stream wavstream = new MemoryStream(); // Initializes a memory stream that will hold .wav file data when being written to. Will be reinitialized in packet receiving functions
 
