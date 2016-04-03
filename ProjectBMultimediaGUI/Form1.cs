@@ -191,7 +191,7 @@ namespace ProjectBMultimediaGUI
 
         private void sendwavBUT_MouseClick(object sender, MouseEventArgs e)
         {
-            if (hostsLB.Items.Count > 0 && hostsLB.SelectedIndex >= 0)
+            if (hostsLB.Items.Count > 0 && hostsLB.SelectedItem != null)
             {
                 //srcvr.Connect()
                 //sock.BeginConnect()
