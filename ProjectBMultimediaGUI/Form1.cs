@@ -29,7 +29,7 @@ namespace ProjectBMultimediaGUI
         UdpClient pub = new UdpClient(PUBLISH_PORT_NUMBER, AddressFamily.InterNetwork); // Creates a new UDP client capable of communicating on a network on port defined by const, via IPv4 addressing
         IPEndPoint UDP_BROADCAST = new IPEndPoint(IPAddress.Broadcast, PUBLISH_PORT_NUMBER); // Broadcast address and port
 
-        TcpClient recvr = new TcpClient(new IPEndPoint(GetLocalIP(), TCP_PORT_NUMBER)); // Bind socket
+        //TcpClient recvr = new TcpClient(new IPEndPoint(GetLocalIP(), TCP_PORT_NUMBER)); // Bind socket
         //Socket sock = new Socket(SocketType.Stream, ProtocolType.Tcp); // Initialize a TCP data stream
 
         Stream wavstream = new MemoryStream(); // Initializes a memory stream that will hold .wav file data when being written to. Will be reinitialized in packet receiving functions
@@ -193,19 +193,19 @@ namespace ProjectBMultimediaGUI
         {
             if (hostsLB.Items.Count > 0 && hostsLB.SelectedItem != null)
             {
-                //srcvr.Connect()
-                //sock.BeginConnect()
-                recvr.BeginConnect((IPAddress)hostsLB.SelectedItem, TCP_PORT_NUMBER, TCPHandler, null);
+                TcpClient tcpsender = new TcpClient((hostsLB.SelectedItem as IPAddress).ToString(),TCP_PORT_NUMBER); // Connect to the client
+                sendwavBUT.Enabled = false;
                 try
                 {
                     FileStream fs = new FileStream(filepathTB.Text, FileMode.Open);
                     while(fs.CanRead && fs.Position!=fs.Length)
                     {
-                        recvr.GetStream().WriteByte((byte)fs.ReadByte());
+                        tcpsender.GetStream().WriteByte((byte)fs.ReadByte());
                         filesendPB.Value = (int)((fs.Position / fs.Length) * 100);
                     }
                 }
                 catch(Exception err) { MessageBox.Show(err.ToString(),"Error",MessageBoxButtons.OK,MessageBoxIcon.Error); }
+                sendwavBUT.Enabled = true;
             }
             else if (hostsLB.Items.Count <= 0)
                 MessageBox.Show("There are no clients to send this file to!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -215,7 +215,7 @@ namespace ProjectBMultimediaGUI
 
         private void TCPHandler(IAsyncResult res)
         {
-            wavstream = recvr.GetStream();
+            //wavstream = recvr.GetStream();
         }
     }
 }
