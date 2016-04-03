@@ -205,7 +205,7 @@ namespace ProjectBMultimediaGUI
             if (hostsLB.Items.Count > 0 && hostsLB.SelectedItem != null)
             {
                 TcpClient tcpsender = new TcpClient((hostsLB.SelectedItem as IPAddress).ToString(),TCP_PORT_NUMBER); // Connect to the client
-                sendwavBUT.Enabled = false;
+                sendwavBUT.Enabled = false; filesendPB.UseWaitCursor = true;
                 try
                 {
                     FileStream fs = new FileStream(filepathTB.Text, FileMode.Open);
@@ -214,9 +214,10 @@ namespace ProjectBMultimediaGUI
                         tcpsender.GetStream().WriteByte((byte)fs.ReadByte());
                         filesendPB.Value = (int)((fs.Position / fs.Length) * 100);
                     }
+                    MessageBox.Show("File send complete.");
                 }
                 catch(Exception err) { MessageBox.Show(err.ToString(),"Error",MessageBoxButtons.OK,MessageBoxIcon.Error); }
-                sendwavBUT.Enabled = true;
+                sendwavBUT.Enabled = true; filesendPB.UseWaitCursor = false;
             }
             else if (hostsLB.Items.Count <= 0)
                 MessageBox.Show("There are no clients to send this file to!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
