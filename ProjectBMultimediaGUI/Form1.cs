@@ -66,6 +66,7 @@ namespace ProjectBMultimediaGUI
         private void playpauseBUT_MouseClick(object sender, MouseEventArgs e)
         {
             SoundPlayer splayer = new SoundPlayer(wavstream);
+            splayer.Load();
             if (wavstream.CanRead && wavstream.Length > 0)
                 splayer.Play();
             Button sbut = (sender as Button);
