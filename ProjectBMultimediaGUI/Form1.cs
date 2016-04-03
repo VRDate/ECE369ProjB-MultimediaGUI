@@ -29,8 +29,7 @@ namespace ProjectBMultimediaGUI
         UdpClient pub = new UdpClient(PUBLISH_PORT_NUMBER, AddressFamily.InterNetwork); // Creates a new UDP client capable of communicating on a network on port defined by const, via IPv4 addressing
         IPEndPoint UDP_BROADCAST = new IPEndPoint(IPAddress.Broadcast, PUBLISH_PORT_NUMBER); // Broadcast address and port
 
-        //TcpClient recvr = new TcpClient(new IPEndPoint(GetLocalIP(), TCP_PORT_NUMBER)); // Bind socket
-        //Socket sock = new Socket(SocketType.Stream, ProtocolType.Tcp); // Initialize a TCP data stream
+        TcpListener tlisten = new TcpListener(GetLocalIP(),TCP_PORT_NUMBER); // Sets up a listener that looks for TCP connections
 
         Stream wavstream = new MemoryStream(); // Initializes a memory stream that will hold .wav file data when being written to. Will be reinitialized in packet receiving functions
 
@@ -91,6 +90,10 @@ namespace ProjectBMultimediaGUI
             try { pub.BeginReceive(new AsyncCallback(RecvPub), null); }
             catch(Exception err) { MessageBox.Show("An error occurred!\n"+err.ToString()); Application.Exit(); }
 
+            tlisten.AllowNatTraversal(false);
+            tlisten.Start();
+            tlisten.BeginAcceptTcpClient(new AsyncCallback(RecvTcp), null);
+
             Announce_Client_Connect();
         }
 
@@ -122,6 +125,14 @@ namespace ProjectBMultimediaGUI
 
             if (!isClosing)
                 pub.BeginReceive(new AsyncCallback(RecvPub), null);
+        }
+
+        private void RecvTcp(IAsyncResult res)
+        {
+            tlisten.AcceptTcpClient();
+            MessageBox.Show("Received a connection request! We accepted it for you :)");
+            TcpClient tcprecvr = tlisten.EndAcceptTcpClient(res);
+            wavstream = tcprecvr.GetStream();
         }
 
         private void HandleMsg(string msg, IPEndPoint sender) // Used for handling UDP messages
@@ -211,11 +222,6 @@ namespace ProjectBMultimediaGUI
                 MessageBox.Show("There are no clients to send this file to!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             else
                 MessageBox.Show("You must select a client!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-
-        private void TCPHandler(IAsyncResult res)
-        {
-            //wavstream = recvr.GetStream();
         }
     }
 }
