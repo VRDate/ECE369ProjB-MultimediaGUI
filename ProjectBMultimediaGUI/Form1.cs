@@ -18,6 +18,7 @@ namespace ProjectBMultimediaGUI
     public partial class Form1 : Form
     {
         private delegate void ObjectDelegate(string msg, IPEndPoint sender);
+        private delegate void LabelChanger(string msg);
 
         const int PUBLISH_PORT_NUMBER = 8030; // Port number used for publish (UDP communications)
         const int TCP_PORT_NUMBER = 8031; // Port number used for the rest of communications (TCP communications)
@@ -30,6 +31,7 @@ namespace ProjectBMultimediaGUI
         IPEndPoint UDP_BROADCAST = new IPEndPoint(IPAddress.Broadcast, PUBLISH_PORT_NUMBER); // Broadcast address and port
 
         TcpListener tlisten = new TcpListener(IPAddress.Any,TCP_PORT_NUMBER); // Sets up a listener that looks for TCP connections
+        TcpClient tcprecvr;
 
         Stream wavstream = new MemoryStream(); // Initializes a memory stream that will hold .wav file data when being written to. Will be reinitialized in packet receiving functions
 
@@ -65,13 +67,14 @@ namespace ProjectBMultimediaGUI
 
         private void playpauseBUT_MouseClick(object sender, MouseEventArgs e)
         {
-            SoundPlayer splayer = new SoundPlayer(wavstream);
-            splayer.Load();
-            if (wavstream.CanRead && wavstream.Length > 0)
-                splayer.Play();
             Button sbut = (sender as Button);
+            SoundPlayer splayer = new SoundPlayer(wavstream);
             if (sbut.ImageIndex == 0) // If the PLAY button was clicked
-            {
+            { // Initiate play functions
+                //splayer.Load();
+                splayer.LoadAsync();
+                //if (wavstream.CanRead && wavstream.Length > 0)
+                splayer.Play();
                 sbut.ImageIndex = 1; // Change the button to show PAUSE
             }
             else // If the PAUSE button was clicked
@@ -131,9 +134,22 @@ namespace ProjectBMultimediaGUI
         private void RecvTcp(IAsyncResult res)
         {
             tlisten.AcceptTcpClient();
-            MessageBox.Show("Received a connection request! We accepted it for you :)");
-            TcpClient tcprecvr = tlisten.EndAcceptTcpClient(res);
+            tcprecvr = tlisten.EndAcceptTcpClient(res);
             wavstream = tcprecvr.GetStream();
+            //MessageBox.Show("Received a connection request! We accepted it for you :)");
+            LabelChanger lblchgr = new LabelChanger(dataavailable);
+            lblchgr.Invoke("Data available!");
+        }
+
+        private void dataavailable(string msg)
+        {
+            if(InvokeRequired)
+            {
+                LabelChanger method = new LabelChanger(dataavailable);
+                Invoke(method, msg);
+                return;
+            }
+            dataavailLBL.Text = "Data available!";
         }
 
         private void HandleMsg(string msg, IPEndPoint sender) // Used for handling UDP messages

@@ -43,6 +43,7 @@
             this.browseBUT = new System.Windows.Forms.Button();
             this.sendwavBUT = new System.Windows.Forms.Button();
             this.filesendPB = new System.Windows.Forms.ProgressBar();
+            this.dataavailLBL = new System.Windows.Forms.Label();
             this.mainMS.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -169,11 +170,21 @@
             this.filesendPB.TabIndex = 7;
             this.filesendPB.UseWaitCursor = true;
             // 
+            // dataavailLBL
+            // 
+            this.dataavailLBL.AutoSize = true;
+            this.dataavailLBL.Location = new System.Drawing.Point(12, 296);
+            this.dataavailLBL.Name = "dataavailLBL";
+            this.dataavailLBL.Size = new System.Drawing.Size(89, 13);
+            this.dataavailLBL.TabIndex = 8;
+            this.dataavailLBL.Text = "Data Unavailable";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(676, 482);
+            this.Controls.Add(this.dataavailLBL);
             this.Controls.Add(this.filesendPB);
             this.Controls.Add(this.sendwavBUT);
             this.Controls.Add(this.browseBUT);
@@ -211,6 +222,7 @@
         private System.Windows.Forms.Button browseBUT;
         private System.Windows.Forms.Button sendwavBUT;
         private System.Windows.Forms.ProgressBar filesendPB;
+        private System.Windows.Forms.Label dataavailLBL;
     }
 }
 
