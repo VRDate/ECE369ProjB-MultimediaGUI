@@ -133,10 +133,19 @@ namespace ProjectBMultimediaGUI
 
         private void RecvTcp(IAsyncResult res)
         {
+            wavstream.Flush();
+
             tlisten.AcceptTcpClient();
             tcprecvr = tlisten.EndAcceptTcpClient(res);
-            wavstream = tcprecvr.GetStream();
-            //MessageBox.Show("Received a connection request! We accepted it for you :)");
+            NetworkStream stream = tcprecvr.GetStream();
+
+            while(stream.CanRead)
+            {
+                wavstream.WriteByte((byte)stream.ReadByte());
+            }
+            //wavstream = tcprecvr.GetStream();
+
+
             LabelChanger lblchgr = new LabelChanger(dataavailable);
             lblchgr.Invoke("Data available!");
         }
@@ -156,7 +165,7 @@ namespace ProjectBMultimediaGUI
         {
             if (!sender.Address.Equals(me)) // Verifies the UDP datagram received isn't from your own machine.
             { //This is done because some UDP datagrams are sent to the broadcast address, which means we receive what we've sent. We obviously don't want packets from ourselves so we block them.
-                if (InvokeRequired) // Used for handling thread magic. Please don't ask me to explain this.
+                if (InvokeRequired && !isClosing) // Used for handling thread magic. Please don't ask me to explain this.
                 {
                     ObjectDelegate method = new ObjectDelegate(HandleMsg);
                     Invoke(method, msg, sender);

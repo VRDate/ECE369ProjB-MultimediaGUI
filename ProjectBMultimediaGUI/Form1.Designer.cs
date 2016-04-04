@@ -54,7 +54,7 @@
             this.fileToolStripMenuItem});
             this.mainMS.Location = new System.Drawing.Point(0, 0);
             this.mainMS.Name = "mainMS";
-            this.mainMS.Size = new System.Drawing.Size(676, 24);
+            this.mainMS.Size = new System.Drawing.Size(178, 24);
             this.mainMS.TabIndex = 0;
             this.mainMS.Text = "menuStrip1";
             this.mainMS.Paint += new System.Windows.Forms.PaintEventHandler(this.mainMS_Paint);
@@ -183,7 +183,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(676, 482);
+            this.ClientSize = new System.Drawing.Size(178, 323);
+            this.ControlBox = false;
             this.Controls.Add(this.dataavailLBL);
             this.Controls.Add(this.filesendPB);
             this.Controls.Add(this.sendwavBUT);
@@ -194,10 +195,11 @@
             this.Controls.Add(this.playpauseBUT);
             this.Controls.Add(this.hostsLB);
             this.Controls.Add(this.mainMS);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.mainMS;
             this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = "ECE 369 Project B -- Multimedia Application";
+            this.Text = "Multimedia App";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.mainMS.ResumeLayout(false);
