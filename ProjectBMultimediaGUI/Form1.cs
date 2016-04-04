@@ -73,8 +73,8 @@ namespace ProjectBMultimediaGUI
             { // Initiate play functions
                 //splayer.Load();
                 splayer.LoadAsync();
-                //if (wavstream.CanRead && wavstream.Length > 0)
-                splayer.Play();
+                if (wavstream.CanRead && wavstream.Length > 0)
+                    splayer.Play();
                 sbut.ImageIndex = 1; // Change the button to show PAUSE
             }
             else // If the PAUSE button was clicked
@@ -139,11 +139,16 @@ namespace ProjectBMultimediaGUI
             tcprecvr = tlisten.EndAcceptTcpClient(res); // Create a new TCP connection with the requester
             NetworkStream stream = tcprecvr.GetStream(); // Get the TCP network stream
 
-            while(stream.CanRead) // While there is data to be read
-                wavstream.WriteByte((byte)stream.ReadByte()); // Write the .WAV data to the wav stream
+            while (stream.CanRead && stream.DataAvailable) // While there is data to be read
+            {
+                int dat = stream.ReadByte();
+                if (dat != -1)
+                    wavstream.WriteByte((byte)dat); // Write the .WAV data to the wav stream
+                else
+                    break;
+            }
 
             tcprecvr.GetStream().WriteByte((byte)'!'); // Send a message saying we're all done here.
-            //wavstream = tcprecvr.GetStream();
 
 
             LabelChanger lblchgr = new LabelChanger(dataavailable);
@@ -231,6 +236,7 @@ namespace ProjectBMultimediaGUI
             if (hostsLB.Items.Count > 0 && hostsLB.SelectedItem != null)
             {
                 TcpClient tcpsender = new TcpClient((hostsLB.SelectedItem as IPAddress).ToString(),TCP_PORT_NUMBER); // Connect to the client
+
                 sendwavBUT.Enabled = false; filesendPB.UseWaitCursor = true;
                 try
                 {
@@ -243,11 +249,15 @@ namespace ProjectBMultimediaGUI
                     fs.Close();
                 }
                 catch(Exception err) { MessageBox.Show(err.ToString(),"Error",MessageBoxButtons.OK,MessageBoxIcon.Error); }
+
                 do
                 {
-                    if (tcpsender.GetStream().ReadByte() == (byte)'!')
+                    int dat = tcpsender.GetStream().ReadByte();
+                    if (dat == '!' || dat == -1)
                         break;
-                } while (tcpsender.GetStream().CanRead);
+                }
+                while (tcpsender.GetStream().CanRead);
+
                 MessageBox.Show("File send complete.");
                 sendwavBUT.Enabled = true; filesendPB.UseWaitCursor = false;
                 tcpsender.Close();
