@@ -241,7 +241,6 @@ namespace ProjectBMultimediaGUI
                         filesendPB.Value = (int)((fs.Position / fs.Length) * 100);
                     }
                     fs.Close();
-                    MessageBox.Show("File send complete.");
                 }
                 catch(Exception err) { MessageBox.Show(err.ToString(),"Error",MessageBoxButtons.OK,MessageBoxIcon.Error); }
                 do
@@ -249,6 +248,7 @@ namespace ProjectBMultimediaGUI
                     if (tcpsender.GetStream().ReadByte() == (byte)'!')
                         break;
                 } while (tcpsender.GetStream().CanRead);
+                MessageBox.Show("File send complete.");
                 sendwavBUT.Enabled = true; filesendPB.UseWaitCursor = false;
                 tcpsender.Close();
             }
