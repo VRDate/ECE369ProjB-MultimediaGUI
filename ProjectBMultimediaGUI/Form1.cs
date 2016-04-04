@@ -133,16 +133,16 @@ namespace ProjectBMultimediaGUI
 
         private void RecvTcp(IAsyncResult res)
         {
-            wavstream.Flush();
+            wavstream.Flush(); // Clear the wav stream, we don't want two wav files in one stream, it would cause errors.
 
-            tlisten.AcceptTcpClient();
-            tcprecvr = tlisten.EndAcceptTcpClient(res);
-            NetworkStream stream = tcprecvr.GetStream();
+            tlisten.AcceptTcpClient(); // Accept the incoming TCP connection.
+            tcprecvr = tlisten.EndAcceptTcpClient(res); // Create a new TCP connection with the requester
+            NetworkStream stream = tcprecvr.GetStream(); // Get the TCP network stream
 
-            while(stream.CanRead)
-            {
-                wavstream.WriteByte((byte)stream.ReadByte());
-            }
+            while(stream.CanRead) // While there is data to be read
+                wavstream.WriteByte((byte)stream.ReadByte()); // Write the .WAV data to the wav stream
+
+            tcprecvr.GetStream().WriteByte((byte)'!'); // Send a message saying we're all done here.
             //wavstream = tcprecvr.GetStream();
 
 
@@ -244,7 +244,13 @@ namespace ProjectBMultimediaGUI
                     MessageBox.Show("File send complete.");
                 }
                 catch(Exception err) { MessageBox.Show(err.ToString(),"Error",MessageBoxButtons.OK,MessageBoxIcon.Error); }
+                do
+                {
+                    if (tcpsender.GetStream().ReadByte() == (byte)'!')
+                        break;
+                } while (tcpsender.GetStream().CanRead);
                 sendwavBUT.Enabled = true; filesendPB.UseWaitCursor = false;
+                tcpsender.Close();
             }
             else if (hostsLB.Items.Count <= 0)
                 MessageBox.Show("There are no clients to send this file to!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
