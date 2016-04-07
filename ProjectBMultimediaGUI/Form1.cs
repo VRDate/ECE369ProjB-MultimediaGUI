@@ -40,6 +40,7 @@ namespace ProjectBMultimediaGUI
         bool isClosing = false; // Used to determine if program is closing
 
         byte[] readbuf = new byte[1024];
+        long wavpos = 0;
 
         public Form1()
         {
@@ -64,15 +65,21 @@ namespace ProjectBMultimediaGUI
             if (sbut.ImageIndex == 0) // If the PLAY button was clicked
             { // Initiate play functions
                 //splayer.Load();
-                splayer.LoadAsync();
+                //splayer.LoadAsync();
                 if (wavstream.CanRead && wavstream.Length > 0)
+                {
+                    splayer.Stream.Position = wavpos;
+                    //splayer.PlaySync();
                     splayer.Play();
+                }
                 sbut.ImageIndex = 1; // Change the button to show PAUSE
             }
             else // If the PAUSE button was clicked
             {
                 splayer.Stop();
+                //wavpos = splayer.Stream.Position;
                 sbut.ImageIndex = 0; // Change the button to show PLAY
+
             }
         }
 
@@ -157,6 +164,7 @@ namespace ProjectBMultimediaGUI
 
         private void RecvTCPData(IAsyncResult res)
         {
+            wavpos = 0; // Reset the stream position
             NetworkStream stream = tcprecvr.GetStream();
             int nbytes = stream.EndRead(res);
             if (nbytes == 0) // Finished reading
