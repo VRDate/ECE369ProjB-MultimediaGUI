@@ -39,6 +39,8 @@ namespace ProjectBMultimediaGUI
 
         bool isClosing = false; // Used to determine if program is closing
 
+        byte[] readbuf = new byte[1024];
+
         public Form1()
         {
             InitializeComponent();
@@ -53,16 +55,6 @@ namespace ProjectBMultimediaGUI
         {
             if (!isClosing)
                 Announce_Client_Connect(); // Announce the client is connected every 250 ms
-        }
-
-        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
-        { Application.Exit(); }
-
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog fopen = new OpenFileDialog();
-            fopen.CheckFileExists = true; fopen.CheckPathExists = true; fopen.Filter = "WAV Files|*.wav";
-            fopen.ShowDialog();
         }
 
         private void playpauseBUT_MouseClick(object sender, MouseEventArgs e)
@@ -121,10 +113,10 @@ namespace ProjectBMultimediaGUI
 
             if(message != null) // If a message was received
             {
-                ObjectDelegate del = new ObjectDelegate(HandleMsg);
+                ObjectDelegate del = new ObjectDelegate(HandleUDPDatagram);
                 dmessage = Encoding.ASCII.GetString(message);
                 del.Invoke(dmessage, recv);
-                HandleMsg(dmessage, recv);
+                HandleUDPDatagram(dmessage, recv);
             }
 
             if (!isClosing)
@@ -138,8 +130,16 @@ namespace ProjectBMultimediaGUI
             tlisten.AcceptTcpClient(); // Accept the incoming TCP connection.
             tcprecvr = tlisten.EndAcceptTcpClient(res); // Create a new TCP connection with the requester
             NetworkStream stream = tcprecvr.GetStream(); // Get the TCP network stream
+            
+            if (stream.CanRead)
+                stream.BeginRead(readbuf, 0, readbuf.Length, new AsyncCallback(RecvTCPData), null);
+            else
+            {
+                tcprecvr.Close();
+                MessageBox.Show("An error has occurred. Unable to read incoming TCP stream.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
+            }
 
-            while (stream.CanRead && stream.DataAvailable) // While there is data to be read
+            /*while (stream.CanRead && stream.DataAvailable) // While there is data to be read
             {
                 int dat = stream.ReadByte();
                 if (dat != -1)
@@ -148,11 +148,27 @@ namespace ProjectBMultimediaGUI
                     break;
             }
 
-            tcprecvr.GetStream().WriteByte((byte)'!'); // Send a message saying we're all done here.
+            tcprecvr.GetStream().WriteByte((byte)'!'); // Send a message saying we're all done here.*/
 
 
             LabelChanger lblchgr = new LabelChanger(dataavailable);
             lblchgr.Invoke("Data available!");
+        }
+
+        private void RecvTCPData(IAsyncResult res)
+        {
+            NetworkStream stream = tcprecvr.GetStream();
+            int nbytes = stream.EndRead(res);
+            if (nbytes == 0) // Finished reading
+            {
+                tcprecvr.Close();
+                return;
+            }
+            else // Not finished reading, data in buffer
+            {
+                wavstream.Write(readbuf, 0, readbuf.Length); // Write WAV data to wav stream
+                stream.BeginRead(readbuf, 0, readbuf.Length, new AsyncCallback(RecvTCPData), null); // begin read again
+            }
         }
 
         private void dataavailable(string msg)
@@ -166,26 +182,26 @@ namespace ProjectBMultimediaGUI
             dataavailLBL.Text = "Data available!";
         }
 
-        private void HandleMsg(string msg, IPEndPoint sender) // Used for handling UDP messages
+        private void HandleUDPDatagram(string msg, IPEndPoint sender) // Used for handling UDP messages
         {
             if (!sender.Address.Equals(me)) // Verifies the UDP datagram received isn't from your own machine.
             { //This is done because some UDP datagrams are sent to the broadcast address, which means we receive what we've sent. We obviously don't want packets from ourselves so we block them.
                 if (InvokeRequired && !isClosing) // Used for handling thread magic. Please don't ask me to explain this.
                 {
-                    ObjectDelegate method = new ObjectDelegate(HandleMsg);
+                    ObjectDelegate method = new ObjectDelegate(HandleUDPDatagram);
                     Invoke(method, msg, sender);
                     return;
                 }
 
                 switch (msg)
                 {
-                    case CLIENT_ANNOUNCE:
+                    case CLIENT_ANNOUNCE: // If we've received a client connection message
                         if (!hostsLB.Items.Contains(sender.Address)) // If the client is not already in the list box
-                            hostsLB.Items.Add(sender.Address);
+                            hostsLB.Items.Add(sender.Address); // Add the client to the listbox of clients
                         break;
-                    case CLIENT_DISCONNECT:
-                        if (hostsLB.Items.Contains(sender.Address))
-                            hostsLB.Items.Remove(sender.Address);
+                    case CLIENT_DISCONNECT: // If we've received a client disconnection message
+                        if (hostsLB.Items.Contains(sender.Address)) // If the client is in the listbox
+                            hostsLB.Items.Remove(sender.Address); // Remove the client from the listbox of clients
                         break;
                 }
             }
@@ -194,37 +210,23 @@ namespace ProjectBMultimediaGUI
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             isClosing = true;
-            Announce_Client_Disconnect();
+            Announce_Client_Disconnect(); // Declare your disconnection to the other clients on the network
         }
 
         private void Announce_Client_Disconnect()
         {
-            byte[] dgram = Encoding.ASCII.GetBytes(CLIENT_DISCONNECT);
-            pub.Send(dgram, dgram.Length, UDP_BROADCAST);
+            byte[] dgram = Encoding.ASCII.GetBytes(CLIENT_DISCONNECT); // Encode the client disconnection message into an array of bytes
+            pub.Send(dgram, dgram.Length, UDP_BROADCAST); // Send the disconnection message off to all clients on the network via the broadcast address
         }
 
         private void Announce_Client_Connect()
         {
-            byte[] dgram = Encoding.ASCII.GetBytes(CLIENT_ANNOUNCE);
-            pub.Send(dgram, dgram.Length, UDP_BROADCAST);
+            byte[] dgram = Encoding.ASCII.GetBytes(CLIENT_ANNOUNCE); // Encode the client connection message into an array of bytes
+            pub.Send(dgram, dgram.Length, UDP_BROADCAST); // Send the connection message off to all clients on the network via the broadcast address
         }
 
-        static IPAddress GetLocalIP() // Has the machine report its local network IP address
-        {
-            IPHostEntry host;
-            host = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (IPAddress ip in host.AddressList)
-            {
-                if (ip.AddressFamily.ToString() == "InterNetwork")
-                {
-                    return ip;
-                }
-            }
-            return null;
-        }
-
-        private void browseBUT_MouseClick(object sender, MouseEventArgs e)
-        {
+        private void OpenBrowse()
+        { // This function allows the user to browse for a file and then sets the file path textbox with the path of the file.
             OpenFileDialog fopen = new OpenFileDialog();
             fopen.CheckFileExists = true; fopen.CheckPathExists = true; fopen.Filter = "WAV Files|*.wav";
             fopen.ShowDialog();
@@ -250,13 +252,13 @@ namespace ProjectBMultimediaGUI
                 }
                 catch(Exception err) { MessageBox.Show(err.ToString(),"Error",MessageBoxButtons.OK,MessageBoxIcon.Error); }
 
-                do
+                /*do
                 {
                     int dat = tcpsender.GetStream().ReadByte();
                     if (dat == '!' || dat == -1)
                         break;
                 }
-                while (tcpsender.GetStream().CanRead);
+                while (tcpsender.GetStream().CanRead);*/
 
                 MessageBox.Show("File send complete.");
                 sendwavBUT.Enabled = true; filesendPB.UseWaitCursor = false;
@@ -267,5 +269,23 @@ namespace ProjectBMultimediaGUI
             else
                 MessageBox.Show("You must select a client!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+
+        static IPAddress GetLocalIP() // Has the machine report its local network IP address
+        { // This code snippet has been taken from StackOverflow and adapted to return an IPAddress rather than a string
+            IPHostEntry host;
+            host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (IPAddress ip in host.AddressList)
+                if (ip.AddressFamily.ToString() == "InterNetwork")
+                    return ip;
+
+            return null;
+        }
+
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        { Application.Exit(); }
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        { OpenBrowse(); }
+        private void browseBUT_MouseClick(object sender, MouseEventArgs e)
+        { OpenBrowse(); }
     }
 }
