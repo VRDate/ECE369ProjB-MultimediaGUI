@@ -141,7 +141,7 @@ namespace ProjectBMultimediaGUI
 
             lblchgr.Invoke("Data unavailable."); // No data available yet.
 
-            tcprecvr = tlisten.AcceptTcpClient(); // Accept the incoming TCP connection.
+            //tcprecvr = tlisten.AcceptTcpClient(); // Accept the incoming TCP connection.
             tcprecvr = tlisten.EndAcceptTcpClient(res); // Create a new TCP connection with the requester
             NetworkStream stream = tcprecvr.GetStream(); // Get the TCP network stream
             
