@@ -15,6 +15,7 @@ using System.IO; // For playing .WAV files (SoundPlayer in System.Media accepts 
 
 namespace ProjectBMultimediaGUI
 {
+
     public partial class Form1 : Form
     {
         private delegate void ObjectDelegate(string msg, IPEndPoint sender);
@@ -132,7 +133,11 @@ namespace ProjectBMultimediaGUI
 
         private void RecvTcp(IAsyncResult res)
         {
+            LabelChanger lblchgr = new LabelChanger(dataavailable); // Used for cross thread operations on dataavailLBL
+
             wavstream.Flush(); // Clear the wav stream, we don't want two wav files in one stream, it would cause errors.
+
+            lblchgr.Invoke("Data unavailable."); // No data available yet.
 
             tlisten.AcceptTcpClient(); // Accept the incoming TCP connection.
             tcprecvr = tlisten.EndAcceptTcpClient(res); // Create a new TCP connection with the requester
@@ -145,31 +150,20 @@ namespace ProjectBMultimediaGUI
                 tcprecvr.Close();
                 MessageBox.Show("An error has occurred. Unable to read incoming TCP stream.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
             }
-
-            /*while (stream.CanRead && stream.DataAvailable) // While there is data to be read
-            {
-                int dat = stream.ReadByte();
-                if (dat != -1)
-                    wavstream.WriteByte((byte)dat); // Write the .WAV data to the wav stream
-                else
-                    break;
-            }
-
-            tcprecvr.GetStream().WriteByte((byte)'!'); // Send a message saying we're all done here.*/
-
-
-            LabelChanger lblchgr = new LabelChanger(dataavailable);
-            lblchgr.Invoke("Data available!");
         }
 
         private void RecvTCPData(IAsyncResult res)
         {
-            wavpos = 0; // Reset the stream position
-            NetworkStream stream = tcprecvr.GetStream();
-            int nbytes = stream.EndRead(res);
+            LabelChanger lblchgr = new LabelChanger(dataavailable); // Used for cross thread operations on dataavailLBL
+
+            wavpos = 0; // Reset the WAV stream position
+
+            NetworkStream stream = tcprecvr.GetStream(); // Get the TCP data stream
+            int nbytes = stream.EndRead(res); // Get the number of bytes read
             if (nbytes == 0) // Finished reading
             {
-                tcprecvr.Close();
+                tcprecvr.Close(); // Close the TCP connection
+                lblchgr.Invoke("Data available!"); // Inform the user there is a .WAV file to be played
                 return;
             }
             else // Not finished reading, data in buffer
@@ -246,6 +240,7 @@ namespace ProjectBMultimediaGUI
             if (hostsLB.Items.Count > 0 && hostsLB.SelectedItem != null)
             {
                 TcpClient tcpsender = new TcpClient((hostsLB.SelectedItem as IPAddress).ToString(),TCP_PORT_NUMBER); // Connect to the client
+                tcpsender.Connect((hostsLB.SelectedItem as IPAddress), TCP_PORT_NUMBER);
 
                 sendwavBUT.Enabled = false; filesendPB.UseWaitCursor = true;
                 try
