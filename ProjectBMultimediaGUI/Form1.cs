@@ -92,10 +92,14 @@ namespace ProjectBMultimediaGUI
             catch(Exception err) { MessageBox.Show("An error occurred!\n"+err.ToString()); Application.Exit(); }
 
             tlisten.AllowNatTraversal(false);
+            BeginListening(); // Begins listening for attempts to connect to the client via TCP
+            Announce_Client_Connect();
+        }
+
+        private void BeginListening()
+        {
             tlisten.Start();
             tlisten.BeginAcceptTcpClient(new AsyncCallback(RecvTcp), null);
-
-            Announce_Client_Connect();
         }
 
         private void stopBUT_MouseClick(object sender, MouseEventArgs e)
@@ -133,7 +137,7 @@ namespace ProjectBMultimediaGUI
         {
             LabelChanger lblchgr = new LabelChanger(dataavailable); // Used for cross thread operations on dataavailLBL
 
-            wavstream.Flush(); // Clear the wav stream, we don't want two wav files in one stream, it would cause errors.
+            wavstream = new MemoryStream(); // Clear the wav stream, we don't want two wav files in one stream, it would cause errors.
 
             lblchgr.Invoke("Data unavailable."); // No data available yet.
 
@@ -148,6 +152,8 @@ namespace ProjectBMultimediaGUI
                 tcprecvr.Close();
                 MessageBox.Show("An error has occurred. Unable to read incoming TCP stream.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
             }
+
+            BeginListening(); // Begin listening to connection requests again
         }
 
         private void RecvTCPData(IAsyncResult res)
