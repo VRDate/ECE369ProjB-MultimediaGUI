@@ -141,7 +141,7 @@ namespace ProjectBMultimediaGUI
 
             lblchgr.Invoke("Data unavailable."); // No data available yet.
 
-            tlisten.AcceptTcpClient(); // Accept the incoming TCP connection.
+            tcprecvr = tlisten.AcceptTcpClient(); // Accept the incoming TCP connection.
             tcprecvr = tlisten.EndAcceptTcpClient(res); // Create a new TCP connection with the requester
             NetworkStream stream = tcprecvr.GetStream(); // Get the TCP network stream
             
@@ -152,8 +152,6 @@ namespace ProjectBMultimediaGUI
                 tcprecvr.Close();
                 MessageBox.Show("An error has occurred. Unable to read incoming TCP stream.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
             }
-
-            BeginListening(); // Begin listening to connection requests again
         }
 
         private void RecvTCPData(IAsyncResult res)
@@ -168,7 +166,8 @@ namespace ProjectBMultimediaGUI
             {
                 tcprecvr.Close(); // Close the TCP connection
                 lblchgr.Invoke("Data available!"); // Inform the user there is a .WAV file to be played
-                return;
+                BeginListening(); // Begin listening to connection requests again
+                //return;
             }
             else // Not finished reading, data in buffer
             {
