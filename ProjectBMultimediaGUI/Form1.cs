@@ -69,7 +69,7 @@ namespace ProjectBMultimediaGUI
             { // Initiate play functions
                 if (wavstream.CanRead && wavstream.Length > 0)
                 {
-                    splayer.Stream.Position = wavpos;
+                    splayer.Stream.Position = 0;
                     splayer.Play();
                 }
                 sbut.ImageIndex = 1; // Change the button to show PAUSE
@@ -242,13 +242,13 @@ namespace ProjectBMultimediaGUI
                 sendwavBUT.Enabled = false; filesendPB.UseWaitCursor = true;
                 try
                 {
-                    byte[] buf = new byte[1024]; // !! TRIAL !!
+                    //byte[] buf = new byte[1024]; // !! TRIAL !!
                     FileStream fs = new FileStream(filepathTB.Text, FileMode.Open);
                     while(fs.CanRead && fs.Position!=fs.Length)
                     {
-                        fs.ReadAsync(buf, 0, 1024); // !! TRIAL !!
-                        //tcpsender.GetStream().WriteByte((byte)fs.ReadByte());
-                        tcpsender.GetStream().Write(buf, 0, 1024);
+                        //fs.ReadAsync(buf, 0, 1024); // !! TRIAL !!
+                        tcpsender.GetStream().WriteByte((byte)fs.ReadByte());
+                        //tcpsender.GetStream().Write(buf, 0, 1024);
                         filesendPB.Value = (int)((fs.Position / fs.Length) * 100);
                     }
                     fs.Close(); // Release any resources used by the file stream.
