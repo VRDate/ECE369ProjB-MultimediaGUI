@@ -240,7 +240,6 @@ namespace ProjectBMultimediaGUI
             if (hostsLB.Items.Count > 0 && hostsLB.SelectedItem != null)
             {
                 TcpClient tcpsender = new TcpClient((hostsLB.SelectedItem as IPAddress).ToString(),TCP_PORT_NUMBER); // Connect to the client
-                while (!tcpsender.Connected) ; // Wait for the connection
 
                 sendwavBUT.Enabled = false; filesendPB.UseWaitCursor = true;
                 try
