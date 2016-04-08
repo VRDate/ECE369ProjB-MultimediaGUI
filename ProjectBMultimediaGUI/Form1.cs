@@ -38,6 +38,8 @@ namespace ProjectBMultimediaGUI
 
         Timer tmr = new Timer(); // Timer used to announce client on the local network every 250 ms
 
+        SoundPlayer splayer;
+
         bool isClosing = false; // Used to determine if program is closing
 
         byte[] readbuf = new byte[1024];
@@ -62,15 +64,12 @@ namespace ProjectBMultimediaGUI
         private void playpauseBUT_MouseClick(object sender, MouseEventArgs e)
         {
             Button sbut = (sender as Button);
-            SoundPlayer splayer = new SoundPlayer(wavstream);
+            splayer = new SoundPlayer(wavstream);
             if (sbut.ImageIndex == 0) // If the PLAY button was clicked
             { // Initiate play functions
-                //splayer.Load();
-                //splayer.LoadAsync();
                 if (wavstream.CanRead && wavstream.Length > 0)
                 {
                     splayer.Stream.Position = wavpos;
-                    //splayer.PlaySync();
                     splayer.Play();
                 }
                 sbut.ImageIndex = 1; // Change the button to show PAUSE
@@ -78,9 +77,7 @@ namespace ProjectBMultimediaGUI
             else // If the PAUSE button was clicked
             {
                 splayer.Stop();
-                //wavpos = splayer.Stream.Position;
                 sbut.ImageIndex = 0; // Change the button to show PLAY
-
             }
         }
 
@@ -103,7 +100,8 @@ namespace ProjectBMultimediaGUI
 
         private void stopBUT_MouseClick(object sender, MouseEventArgs e)
         {
-
+            splayer.Stop();
+            playpauseBUT.ImageIndex = 0; // Change the play/pause button to show PLAY
         }
 
         private void mainMS_Paint(object sender, PaintEventArgs e)
@@ -244,27 +242,22 @@ namespace ProjectBMultimediaGUI
                 sendwavBUT.Enabled = false; filesendPB.UseWaitCursor = true;
                 try
                 {
+                    byte[] buf = new byte[1024]; // !! TRIAL !!
                     FileStream fs = new FileStream(filepathTB.Text, FileMode.Open);
                     while(fs.CanRead && fs.Position!=fs.Length)
                     {
-                        tcpsender.GetStream().WriteByte((byte)fs.ReadByte());
+                        fs.ReadAsync(buf, 0, 1024); // !! TRIAL !!
+                        //tcpsender.GetStream().WriteByte((byte)fs.ReadByte());
+                        tcpsender.GetStream().Write(buf, 0, 1024);
                         filesendPB.Value = (int)((fs.Position / fs.Length) * 100);
                     }
-                    fs.Close();
+                    fs.Close(); // Release any resources used by the file stream.
                 }
                 catch(Exception err) { MessageBox.Show(err.ToString(),"Error",MessageBoxButtons.OK,MessageBoxIcon.Error); }
 
-                /*do
-                {
-                    int dat = tcpsender.GetStream().ReadByte();
-                    if (dat == '!' || dat == -1)
-                        break;
-                }
-                while (tcpsender.GetStream().CanRead);*/
-
                 MessageBox.Show("File send complete.");
-                sendwavBUT.Enabled = true; filesendPB.UseWaitCursor = false;
-                tcpsender.Close();
+                tcpsender.Close(); // Release any resources used by the TCP stream and close the TCP connection.
+                sendwavBUT.Enabled = true; filesendPB.UseWaitCursor = false; // Re-enable the send button.
             }
             else if (hostsLB.Items.Count <= 0)
                 MessageBox.Show("There are no clients to send this file to!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
