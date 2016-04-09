@@ -145,9 +145,11 @@ namespace ProjectBMultimediaGUI
             //tcprecvr = tlisten.AcceptTcpClient(); // Accept the incoming TCP connection.
             tcprecvr = tlisten.EndAcceptTcpClient(res); // Create a new TCP connection with the requester
             NetworkStream stream = tcprecvr.GetStream(); // Get the TCP network stream
-            System.Threading.Thread.Sleep(50);
             if (stream.CanRead)
+            {
+                while (!stream.DataAvailable) ;
                 stream.BeginRead(readbuf, 0, readbuf.Length, new AsyncCallback(RecvTCPData), null);
+            }
             else
             {
                 tcprecvr.Close();
@@ -254,7 +256,6 @@ namespace ProjectBMultimediaGUI
                     {
                         //fs.ReadAsync(buf, 0, 1024); // !! TRIAL !!
                         tcpsender.GetStream().WriteByte((byte)fs.ReadByte());
-                        fs.Seek(1, SeekOrigin.Current);
                         //tcpsender.GetStream().Write(buf, 0, 1024);
                         filesendPB.Value = (int)((fs.Position / fs.Length) * 100);
                     }
