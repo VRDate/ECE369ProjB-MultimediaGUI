@@ -111,6 +111,7 @@ namespace ProjectBMultimediaGUI
         private void mainMS_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.DrawLine(new Pen(Color.Black), mainMS.Left, mainMS.Bottom-1, mainMS.Right, mainMS.Bottom-1); // Draws a border on the bottom of the main menu strip.
+            e.Graphics.DrawLine(new Pen(Color.Black), mainMS.Left, mainMS.Top, mainMS.Right, mainMS.Top); // Draws a border on the top of the menu strip.
         }
 
         private void RecvPub(IAsyncResult res) // Function used to handle received UDP messages
