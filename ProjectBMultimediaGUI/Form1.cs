@@ -174,7 +174,8 @@ namespace ProjectBMultimediaGUI
             }
             else // Not finished reading, data in buffer
             {
-                wavstream.Write(readbuf, 0, readbuf.Length); // Write WAV data to wav stream
+                //wavstream.Write(readbuf, 0, readbuf.Length); // Write WAV data to wav stream
+                wavstream.Write(readbuf, 0, nbytes); // !! TRIAL !!
                 stream.BeginRead(readbuf, 0, readbuf.Length, new AsyncCallback(RecvTCPData), null); // begin read again
             }
         }
