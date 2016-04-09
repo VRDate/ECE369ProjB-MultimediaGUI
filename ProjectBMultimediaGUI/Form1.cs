@@ -43,7 +43,6 @@ namespace ProjectBMultimediaGUI
         bool isClosing = false; // Used to determine if program is closing
 
         byte[] readbuf = new byte[1024];
-        long wavpos = 0;
 
         public Form1()
         {
@@ -69,16 +68,17 @@ namespace ProjectBMultimediaGUI
             { // Initiate play functions
                 if (wavstream.CanRead && wavstream.Length > 0)
                 {
-                    splayer.Stream.Position = 0;
+                    wavstream.Position = 0;
                     splayer.Play();
                 }
-                sbut.ImageIndex = 1; // Change the button to show PAUSE
+                //sbut.ImageIndex = 1; // Change the button to show PAUSE
             }
-            else // If the PAUSE button was clicked
+            /*else // If the PAUSE button was clicked
             {
                 splayer.Stop();
+                wavpos = wavstream.Position;
                 sbut.ImageIndex = 0; // Change the button to show PLAY
-            }
+            }*/
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -105,7 +105,6 @@ namespace ProjectBMultimediaGUI
         private void stopBUT_MouseClick(object sender, MouseEventArgs e)
         {
             splayer.Stop();
-            playpauseBUT.ImageIndex = 0; // Change the play/pause button to show PLAY
         }
 
         private void mainMS_Paint(object sender, PaintEventArgs e)
@@ -142,14 +141,10 @@ namespace ProjectBMultimediaGUI
 
             lblchgr.Invoke("Data unavailable."); // No data available yet.
 
-            //tcprecvr = tlisten.AcceptTcpClient(); // Accept the incoming TCP connection.
             tcprecvr = tlisten.EndAcceptTcpClient(res); // Create a new TCP connection with the requester
             NetworkStream stream = tcprecvr.GetStream(); // Get the TCP network stream
             if (stream.CanRead)
-            {
-                while (!stream.DataAvailable) ;
                 stream.BeginRead(readbuf, 0, readbuf.Length, new AsyncCallback(RecvTCPData), null);
-            }
             else
             {
                 tcprecvr.Close();
@@ -161,26 +156,22 @@ namespace ProjectBMultimediaGUI
         {
             LabelChanger lblchgr = new LabelChanger(dataavailable); // Used for cross thread operations on dataavailLBL
 
-            wavpos = 0; // Reset the WAV stream position
-
             NetworkStream stream = tcprecvr.GetStream(); // Get the TCP data stream
-            int nbytes = stream.EndRead(res); // Get the number of bytes read
+            int nbytes = stream.EndRead(res); // Get the number of bytes read, and end the read
             if (nbytes == 0) // Finished reading
             {
                 tcprecvr.Close(); // Close the TCP connection
                 lblchgr.Invoke("Data available!"); // Inform the user there is a .WAV file to be played
                 BeginListening(); // Begin listening to connection requests again
-                //return;
             }
             else // Not finished reading, data in buffer
             {
-                //wavstream.Write(readbuf, 0, readbuf.Length); // Write WAV data to wav stream
-                wavstream.Write(readbuf, 0, nbytes); // !! TRIAL !!
-                stream.BeginRead(readbuf, 0, readbuf.Length, new AsyncCallback(RecvTCPData), null); // begin read again
+                wavstream.Write(readbuf, 0, nbytes); // Write the data read into the .WAV stream
+                stream.BeginRead(readbuf, 0, readbuf.Length, new AsyncCallback(RecvTCPData), null); // Start reading in data again
             }
         }
 
-        private void dataavailable(string msg)
+        private void dataavailable(string msg) // Used for cross-thread operations on the dataavailLBL
         {
             if(InvokeRequired)
             {
@@ -251,7 +242,6 @@ namespace ProjectBMultimediaGUI
                 sendwavBUT.Enabled = false; filesendPB.UseWaitCursor = true;
                 try
                 {
-                    //byte[] buf = new byte[1024]; // !! TRIAL !!
                     FileStream fs = new FileStream(filepathTB.Text, FileMode.Open);
                     int dat = 0;
                     while(fs.CanRead && fs.Position!=fs.Length)
