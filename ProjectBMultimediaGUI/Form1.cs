@@ -18,31 +18,35 @@ namespace ProjectBMultimediaGUI
 
     public partial class Form1 : Form
     {
+        #region Delegate Definitions
         private delegate void ObjectDelegate(string msg, IPEndPoint sender);
         private delegate void LabelChanger(string msg);
-
+        private delegate void ButtonStateChanger(bool enabled);
+        #endregion
+        #region Port Definitions
         const int PUBLISH_PORT_NUMBER = 8030; // Port number used for publish (UDP communications)
         const int TCP_PORT_NUMBER = 8031; // Port number used for the rest of communications (TCP communications)
-        IPAddress me = GetLocalIP(); // me is the IPAddress that your machine currently owns on the local network
-
-        const string CLIENT_ANNOUNCE = "[ECE 369] Multimedia client publish"; // UDP datagram to be sent when the client is announcing itself
-        const string CLIENT_DISCONNECT = "[ECE 369] Multimedia client disconnect"; // UDP datagram to be sent when the client is announcing that it is disconnecting
-
+        #endregion
+        #region UDP Setup
         UdpClient pub = new UdpClient(PUBLISH_PORT_NUMBER, AddressFamily.InterNetwork); // Creates a new UDP client capable of communicating on a network on port defined by const, via IPv4 addressing
         IPEndPoint UDP_BROADCAST = new IPEndPoint(IPAddress.Broadcast, PUBLISH_PORT_NUMBER); // Broadcast address and port
-
+        const string CLIENT_ANNOUNCE = "[ECE 369] Multimedia client publish"; // UDP datagram to be sent when the client is announcing itself
+        const string CLIENT_DISCONNECT = "[ECE 369] Multimedia client disconnect"; // UDP datagram to be sent when the client is announcing that it is disconnecting
+        IPAddress me = GetLocalIP(); // me is the IPAddress that your machine currently owns on the local network, used for UDP communications
+        #endregion
+        #region TCP Setup
         TcpListener tlisten = new TcpListener(IPAddress.Any,TCP_PORT_NUMBER); // Sets up a listener that looks for TCP connections
         TcpClient tcprecvr;
-
+        byte[] readbuf = new byte[1024];
+        #endregion
+        #region Sound Player setup
+        SoundPlayer splayer;
         Stream wavstream = new MemoryStream(); // Initializes a memory stream that will hold .wav file data when being written to. Will be reinitialized in packet receiving functions
+        #endregion
 
         Timer tmr = new Timer(); // Timer used to announce client on the local network every 250 ms
 
-        SoundPlayer splayer;
-
         bool isClosing = false; // Used to determine if program is closing
-
-        byte[] readbuf = new byte[1024];
 
         public Form1()
         {
@@ -64,21 +68,11 @@ namespace ProjectBMultimediaGUI
         {
             Button sbut = (sender as Button);
             splayer = new SoundPlayer(wavstream);
-            if (sbut.ImageIndex == 0) // If the PLAY button was clicked
-            { // Initiate play functions
-                if (wavstream.CanRead && wavstream.Length > 0)
-                {
-                    wavstream.Position = 0;
-                    splayer.Play();
-                }
-                //sbut.ImageIndex = 1; // Change the button to show PAUSE
-            }
-            /*else // If the PAUSE button was clicked
+            if (wavstream.CanRead && wavstream.Length > 0)
             {
-                splayer.Stop();
-                wavpos = wavstream.Position;
-                sbut.ImageIndex = 0; // Change the button to show PLAY
-            }*/
+                wavstream.Position = 0;
+                splayer.Play();
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -93,19 +87,17 @@ namespace ProjectBMultimediaGUI
 
             tlisten.AllowNatTraversal(false);
             BeginListening(); // Begins listening for attempts to connect to the client via TCP
-            Announce_Client_Connect();
+            Announce_Client_Connect(); // Announce to the local network that we are running
         }
 
-        private void BeginListening()
+        private void BeginListening() // Used to begin listening for TCP connection attempts
         {
             tlisten.Start();
             tlisten.BeginAcceptTcpClient(new AsyncCallback(RecvTcp), null);
         }
 
         private void stopBUT_MouseClick(object sender, MouseEventArgs e)
-        {
-            splayer.Stop();
-        }
+        { splayer.Stop(); }
 
         private void mainMS_Paint(object sender, PaintEventArgs e)
         {
@@ -133,13 +125,16 @@ namespace ProjectBMultimediaGUI
                 pub.BeginReceive(new AsyncCallback(RecvPub), null);
         }
 
-        private void RecvTcp(IAsyncResult res)
+        private void RecvTcp(IAsyncResult res) // Event function that will handle TCP connection attempts
         {
             LabelChanger lblchgr = new LabelChanger(dataavailable); // Used for cross thread operations on dataavailLBL
+            ButtonStateChanger btnchgr = new ButtonStateChanger(BtnStateChanger); // Used for cross thread operations on the play & stop buttons
 
             wavstream = new MemoryStream(); // Clear the wav stream, we don't want two wav files in one stream, it would cause errors.
 
             lblchgr.Invoke("Data unavailable."); // No data available yet.
+            btnchgr.Invoke(false); // Disable the play, stop buttons
+
 
             tcprecvr = tlisten.EndAcceptTcpClient(res); // Create a new TCP connection with the requester
             NetworkStream stream = tcprecvr.GetStream(); // Get the TCP network stream
@@ -155,6 +150,7 @@ namespace ProjectBMultimediaGUI
         private void RecvTCPData(IAsyncResult res)
         {
             LabelChanger lblchgr = new LabelChanger(dataavailable); // Used for cross thread operations on dataavailLBL
+            ButtonStateChanger btnchgr = new ButtonStateChanger(BtnStateChanger);
 
             NetworkStream stream = tcprecvr.GetStream(); // Get the TCP data stream
             int nbytes = stream.EndRead(res); // Get the number of bytes read, and end the read
@@ -162,6 +158,7 @@ namespace ProjectBMultimediaGUI
             {
                 tcprecvr.Close(); // Close the TCP connection
                 lblchgr.Invoke("Data available!"); // Inform the user there is a .WAV file to be played
+                btnchgr.Invoke(true);
                 BeginListening(); // Begin listening to connection requests again
             }
             else // Not finished reading, data in buffer
@@ -180,6 +177,17 @@ namespace ProjectBMultimediaGUI
                 return;
             }
             dataavailLBL.Text = "Data available!";
+        }
+
+        private void BtnStateChanger(bool state) // Used for cross thread operations on the play and stop buttons
+        {
+            if(InvokeRequired)
+            {
+                ButtonStateChanger method = new ButtonStateChanger(BtnStateChanger);
+                Invoke(method, state);
+                return;
+            }
+            playpauseBUT.Enabled = stopBUT.Enabled = state;
         }
 
         private void HandleUDPDatagram(string msg, IPEndPoint sender) // Used for handling UDP messages

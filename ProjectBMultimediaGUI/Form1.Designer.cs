@@ -93,6 +93,7 @@
             // playpauseBUT
             // 
             this.playpauseBUT.BackColor = System.Drawing.Color.Transparent;
+            this.playpauseBUT.Enabled = false;
             this.playpauseBUT.FlatAppearance.BorderSize = 0;
             this.playpauseBUT.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.playpauseBUT.ImageIndex = 0;
@@ -115,6 +116,7 @@
             // stopBUT
             // 
             this.stopBUT.BackColor = System.Drawing.Color.Transparent;
+            this.stopBUT.Enabled = false;
             this.stopBUT.FlatAppearance.BorderSize = 0;
             this.stopBUT.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.stopBUT.ImageIndex = 2;
@@ -164,11 +166,11 @@
             // 
             // filesendPB
             // 
+            this.filesendPB.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.filesendPB.Location = new System.Drawing.Point(12, 195);
             this.filesendPB.Name = "filesendPB";
             this.filesendPB.Size = new System.Drawing.Size(150, 23);
             this.filesendPB.TabIndex = 7;
-            this.filesendPB.UseWaitCursor = true;
             // 
             // dataavailLBL
             // 

@@ -16,3 +16,12 @@ C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ECE369ProjB-MultimediaGUI\P
 C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ECE369ProjB-MultimediaGUI\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.Form1.resources
 C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ECE369ProjB-MultimediaGUI\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.Properties.Resources.resources
 C:\Users\Christopher\Documents\ProjectBMultimediaGUI\ECE369ProjB-MultimediaGUI\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.csproj.GenerateResource.Cache
+Z:\Junior Year (2015-2016)\ECE 369\ECE369ProjB-MultimediaGUI-master\ProjectBMultimediaGUI\bin\Debug\ProjectBMultimediaGUI.exe.config
+Z:\Junior Year (2015-2016)\ECE 369\ECE369ProjB-MultimediaGUI-master\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.exe
+Z:\Junior Year (2015-2016)\ECE 369\ECE369ProjB-MultimediaGUI-master\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.pdb
+Z:\Junior Year (2015-2016)\ECE 369\ECE369ProjB-MultimediaGUI-master\ProjectBMultimediaGUI\bin\Debug\ProjectBMultimediaGUI.exe
+Z:\Junior Year (2015-2016)\ECE 369\ECE369ProjB-MultimediaGUI-master\ProjectBMultimediaGUI\bin\Debug\ProjectBMultimediaGUI.pdb
+Z:\Junior Year (2015-2016)\ECE 369\ECE369ProjB-MultimediaGUI-master\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.csprojResolveAssemblyReference.cache
+Z:\Junior Year (2015-2016)\ECE 369\ECE369ProjB-MultimediaGUI-master\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.Form1.resources
+Z:\Junior Year (2015-2016)\ECE 369\ECE369ProjB-MultimediaGUI-master\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.Properties.Resources.resources
+Z:\Junior Year (2015-2016)\ECE 369\ECE369ProjB-MultimediaGUI-master\ProjectBMultimediaGUI\obj\Debug\ProjectBMultimediaGUI.csproj.GenerateResource.Cache
