@@ -13,4 +13,5 @@ This program is designed to send and receive .WAV files between two clients, and
 The source code for this program is available under the MIT License.
 
 Credit must be given to the following authors:
+
 Christopher Parks (cparks13@live.com)
