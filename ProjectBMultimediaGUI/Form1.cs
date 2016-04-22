@@ -251,11 +251,11 @@ namespace ProjectBMultimediaGUI
                 try
                 {
                     FileStream fs = new FileStream(filepathTB.Text, FileMode.Open);
-                    int dat = 0;
+                    //int dat = 0;
                     byte[] fbuf = new byte[1024]; int nbytes=0;
                     while(fs.CanRead && fs.Position!=fs.Length)
                     {
-                        dat = fs.ReadByte();
+                        //dat = fs.ReadByte();
                         nbytes = fs.Read(fbuf, 0, 1024);
 
                         if (nbytes > 0) // Data was read in from the file
@@ -263,8 +263,8 @@ namespace ProjectBMultimediaGUI
                             tcpsender.GetStream().Write(fbuf, 0, nbytes);
                             filesendPB.Value = (int)((fs.Position / fs.Length) * 100);
                         }
-                        else // Finished reading data and sending data
-                        { }
+                        //else // Finished reading data and sending data
+                        //{ }
 
                         /*if (dat != -1)
                         {
