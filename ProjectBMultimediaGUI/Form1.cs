@@ -253,30 +253,17 @@ namespace ProjectBMultimediaGUI
                     FileStream fs = new FileStream(filepathTB.Text, FileMode.Open);
                     if (fs.Length <= int.MaxValue) // This is done to ensure 1.) The file size can be converted to an int and 2.) The file size is <= 2.14 GB
                     {
-                        int hundredthwavsize = (int)(fs.Length / 100); // We will be reading in the file in hundredths.
-
-                        //int dat = 0;
-                        //byte[] fbuf = new byte[1024]; int nbytes = 0;
+                        int hundredthwavsize = (int)(fs.Length / 100); // We will be reading in the file in iterations of hundredths.
                         byte[] fbuf = new byte[hundredthwavsize]; int nbytes = 0;
                         while (fs.CanRead && fs.Position != fs.Length)
                         {
-                            //dat = fs.ReadByte();
-                            //nbytes = fs.Read(fbuf, 0, 1024);
                             nbytes = fs.Read(fbuf, 0, hundredthwavsize);
 
                             if (nbytes > 0) // Data was read in from the file
                             {
+                                filesendPB.Value = (int)((fs.Position / fs.Length) * 100);
                                 tcpsender.GetStream().Write(fbuf, 0, nbytes);
-                                filesendPB.Value = (int)((fs.Position / fs.Length) * 100);
                             }
-                            //else // Finished reading data and sending data
-                            //{ }
-
-                            /*if (dat != -1)
-                            {
-                                tcpsender.GetStream().WriteByte((byte)dat);
-                                filesendPB.Value = (int)((fs.Position / fs.Length) * 100);
-                            }*/
                         }
                         fs.Close(); // Release any resources used by the file stream.
                     }
