@@ -261,14 +261,14 @@ namespace ProjectBMultimediaGUI
 
                             if (nbytes > 0) // Data was read in from the file
                             {
-                                filesendPB.Value = (int)((fs.Position / fs.Length) * 100);
                                 tcpsender.GetStream().Write(fbuf, 0, nbytes);
+                                filesendPB.Value = (int)(((float)fs.Position / (float)fs.Length) * 100); // Update progress bar AFTER the file is written to stream.
                             }
                         }
                         fs.Close(); // Release any resources used by the file stream.
                     }
                     else // File size is 2.14 GB or larger. Program is NOT made to handle a load like that.
-                        MessageBox.Show("File too large!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
+                        MessageBox.Show("File is too large!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
                 }
                 catch(Exception err) { MessageBox.Show(err.ToString(),"Error",MessageBoxButtons.OK,MessageBoxIcon.Error); }
 
