@@ -252,14 +252,25 @@ namespace ProjectBMultimediaGUI
                 {
                     FileStream fs = new FileStream(filepathTB.Text, FileMode.Open);
                     int dat = 0;
+                    byte[] fbuf = new byte[1024]; int nbytes=0;
                     while(fs.CanRead && fs.Position!=fs.Length)
                     {
                         dat = fs.ReadByte();
-                        if (dat != -1)
+                        nbytes = fs.Read(fbuf, 0, 1024);
+
+                        if (nbytes > 0) // Data was read in from the file
+                        {
+                            tcpsender.GetStream().Write(fbuf, 0, nbytes);
+                            filesendPB.Value = (int)((fs.Position / fs.Length) * 100);
+                        }
+                        else // Finished reading data and sending data
+                        { }
+
+                        /*if (dat != -1)
                         {
                             tcpsender.GetStream().WriteByte((byte)dat);
                             filesendPB.Value = (int)((fs.Position / fs.Length) * 100);
-                        }
+                        }*/
                     }
                     fs.Close(); // Release any resources used by the file stream.
                 }
